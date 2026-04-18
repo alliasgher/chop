@@ -1,6 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 import { db } from '../db/client';
 import { broadcast } from '../ws/hub';
+import { sendConfirmationEmail } from '../services/email.service';
+import { env } from '../config';
 
 export async function bookingRoutes(fastify: FastifyInstance) {
   // POST /api/shops/:slug/bookings — customer creates a booking
@@ -49,6 +51,24 @@ export async function bookingRoutes(fastify: FastifyInstance) {
           staff_name: staff?.name,
         },
       });
+
+      // Fire-and-forget confirmation email
+      const { rows: [shopFull] } = await db.query(
+        'SELECT name, email, address FROM shops WHERE id = $1', [shop.id]
+      );
+      sendConfirmationEmail({
+        bookingId: booking.id,
+        customerName: body.customerName,
+        customerEmail: body.customerEmail,
+        staffName: staff?.name ?? '',
+        serviceName: service.name,
+        shopName: shopFull.name,
+        shopAddress: shopFull.address ?? '',
+        shopEmail: shopFull.email ?? env.RESEND_FROM,
+        startsAt,
+        endsAt,
+        depositPaidCents: 0,
+      }).catch((err) => console.error('Email send failed:', err));
 
       return reply.code(201).send({ booking });
     } catch (err: any) {
