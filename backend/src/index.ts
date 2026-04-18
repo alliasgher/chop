@@ -11,6 +11,7 @@ import { publicRoutes } from './routes/public';
 import { bookingRoutes } from './routes/bookings';
 import { ownerShopRoutes } from './routes/owner/shops';
 import { ownerBookingRoutes } from './routes/owner/bookings';
+import { stripeRoutes } from './routes/stripe';
 import { wsRoutes } from './ws/routes';
 
 const fastify = Fastify({ logger: true });
@@ -30,6 +31,7 @@ async function bootstrap() {
   await fastify.register(bookingRoutes);
   await fastify.register(ownerShopRoutes);
   await fastify.register(ownerBookingRoutes);
+  await fastify.register(stripeRoutes);
   await fastify.register(wsRoutes);
 
   await fastify.listen({ port: env.PORT, host: '0.0.0.0' });
