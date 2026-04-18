@@ -35,6 +35,23 @@ export async function publicRoutes(fastify: FastifyInstance) {
     return { shop, staff, services, staffServices: assignments };
   });
 
+  // GET /api/shops/:slug/bookings/today — public for live demo panel
+  fastify.get('/api/shops/:slug/bookings/today', async (req, reply) => {
+    const { slug } = req.params as { slug: string };
+    const { rows: [shop] } = await db.query('SELECT id FROM shops WHERE slug = $1', [slug]);
+    if (!shop) return reply.code(404).send({ error: 'Not found' });
+    const { rows } = await db.query(`
+      SELECT b.id, b.customer_name, b.starts_at, b.status,
+             s.name AS service_name, st.name AS staff_name
+      FROM bookings b
+      JOIN services s ON s.id = b.service_id
+      JOIN staff st ON st.id = b.staff_id
+      WHERE b.shop_id = $1 AND b.starts_at::date = CURRENT_DATE
+      ORDER BY b.starts_at
+    `, [shop.id]);
+    return { bookings: rows };
+  });
+
   // GET /api/shops/:slug/staff/:staffId/slots?date=YYYY-MM-DD&serviceId=uuid
   fastify.get('/api/shops/:slug/staff/:staffId/slots', async (req, reply) => {
     const { slug, staffId } = req.params as { slug: string; staffId: string };
