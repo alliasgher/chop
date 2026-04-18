@@ -11,6 +11,8 @@ import { publicRoutes } from './routes/public';
 import { bookingRoutes } from './routes/bookings';
 import { ownerShopRoutes } from './routes/owner/shops';
 import { ownerBookingRoutes } from './routes/owner/bookings';
+import { ownerServiceRoutes } from './routes/owner/services';
+import { ownerStaffRoutes } from './routes/owner/staff';
 import { stripeRoutes } from './routes/stripe';
 import { demoRoutes } from './routes/demo';
 import { wsRoutes } from './ws/routes';
@@ -32,6 +34,8 @@ async function bootstrap() {
   await fastify.register(bookingRoutes);
   await fastify.register(ownerShopRoutes);
   await fastify.register(ownerBookingRoutes);
+  await fastify.register(ownerServiceRoutes);
+  await fastify.register(ownerStaffRoutes);
   await fastify.register(stripeRoutes);
   await fastify.register(demoRoutes);
   await fastify.register(wsRoutes);
