@@ -13,6 +13,22 @@ export async function ownerShopRoutes(fastify: FastifyInstance) {
     return { shops: rows };
   });
 
+  // POST /api/owner/shops — create a new shop (called from wizard)
+  fastify.post('/api/owner/shops', { preHandler: verifyJwt }, async (req, reply) => {
+    const user = req.user as { sub: string };
+    const b = req.body as any;
+    const { rows: [shop] } = await db.query(`
+      INSERT INTO shops (owner_id, slug, name, timezone, colors, fonts, description, is_demo, expires_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `, [
+      user.sub, b.slug, b.name, b.timezone ?? 'America/New_York',
+      JSON.stringify(b.colors ?? {}), JSON.stringify(b.fonts ?? {}),
+      b.description ?? null, b.is_demo ?? false, b.expires_at ?? null,
+    ]);
+    return reply.code(201).send({ shop });
+  });
+
   // GET /api/owner/shops/:shopId
   fastify.get('/api/owner/shops/:shopId', { preHandler: verifyJwt }, async (req, reply) => {
     const { shopId } = req.params as { shopId: string };
