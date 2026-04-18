@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import { DateTime } from 'luxon';
 import { db } from './client';
