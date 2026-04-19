@@ -1,5 +1,3 @@
-import { config } from 'process';
-
 const required = (key: string): string => {
   const val = process.env[key];
   if (!val) throw new Error(`Missing required env var: ${key}`);
