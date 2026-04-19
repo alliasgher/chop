@@ -46,6 +46,6 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => {
-  fastify.log.error(err);
+  console.error('STARTUP ERROR:', err);
   process.exit(1);
 });
