@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Nav } from '@/components/shared/nav';
 import { Footer } from '@/components/shared/footer';
-import { ThreeCardGrid } from '@/components/marketing/three-card-grid';
 
 export default function Home() {
   return (
@@ -10,110 +9,129 @@ export default function Home() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-brand-ink text-white overflow-hidden relative">
-          {/* Background accent blobs */}
           <div className="absolute top-[-80px] right-[-80px] w-96 h-96 rounded-full bg-brand-violet/20 blur-3xl pointer-events-none" />
           <div className="absolute bottom-[-60px] left-[20%] w-64 h-64 rounded-full bg-brand-red/20 blur-3xl pointer-events-none" />
-          <div className="absolute top-[30%] right-[30%] w-48 h-48 rounded-full bg-brand-teal/10 blur-2xl pointer-events-none" />
 
-          <div className="max-w-7xl mx-auto px-6 py-28 md:py-36 relative z-10">
-            {/* Live badge */}
+          <div className="max-w-5xl mx-auto px-6 pt-24 pb-20 md:pt-32 md:pb-28 relative z-10 text-center">
             <div className="inline-flex items-center gap-2 bg-brand-teal/10 border border-brand-teal/30 rounded-full px-4 py-2 mb-8">
               <span className="w-2 h-2 rounded-full bg-brand-teal animate-pulse" />
-              <span className="text-brand-teal text-xs font-semibold tracking-wide uppercase">Real bookings happening right now</span>
+              <span className="text-brand-teal text-xs font-semibold tracking-wide uppercase">Portfolio demo · Live</span>
             </div>
 
-            <h1 className="font-heading text-5xl md:text-7xl font-bold leading-[1.05] max-w-4xl mb-6">
-              See a booking appear
-              <span className="block">
-                <span className="text-brand-red">live</span> on the dashboard
-              </span>
-              <span className="text-white/50 block">the instant you make it.</span>
+            <h1 className="font-heading text-5xl md:text-7xl font-bold leading-[1.05] mb-6">
+              Appointment booking,<br />
+              <span className="text-brand-red">built for barbershops.</span>
             </h1>
 
-            <p className="text-white/60 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
-              A complete appointment booking system for barbershops — real-time WebSocket updates,
-              Stripe payments, automated emails, and a drag-to-reschedule calendar. All in one demo.
+            <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+              A full booking system with Stripe payments, email reminders, and a live dashboard that updates the instant a customer books — all running right now.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/live"
+                href="/book/chop-barbers"
                 className="inline-flex items-center justify-center gap-2 bg-brand-red text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-brand-red/90 transition-colors"
               >
-                Watch it live
+                Try the booking flow
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
               <Link
-                href="/book/chop-barbers"
+                href="/live"
                 className="inline-flex items-center justify-center gap-2 border border-white/20 text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-white/5 transition-colors"
               >
-                Try the booking flow
+                See it update live
               </Link>
             </div>
           </div>
-
-          {/* Stats bar */}
-          <div className="border-t border-white/10">
-            <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { value: '< 1s', label: 'WebSocket latency', color: 'text-brand-teal' },
-                { value: '$0', label: 'Monthly cost to run', color: 'text-brand-amber' },
-                { value: '8', label: 'Services per barber', color: 'text-brand-violet' },
-                { value: '3', label: 'Barbers, live & bookable', color: 'text-brand-red' },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div className={`font-heading text-3xl font-bold ${stat.color}`}>{stat.value}</div>
-                  <div className="text-white/40 text-xs mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
-        {/* Three cards */}
-        <ThreeCardGrid />
-
-        {/* Tech stack callout */}
-        <section className="bg-brand-surface border-y border-brand-border">
-          <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="max-w-xl">
-              <h2 className="font-heading text-3xl font-semibold text-brand-ink mb-3">
-                Built to impress clients, not just recruiters.
-              </h2>
-              <p className="text-brand-muted text-sm leading-relaxed">
-                Next.js 15 · Fastify · PostgreSQL on Neon · WebSockets · Stripe · Resend emails with ICS attachments.
-                Every piece a real production decision, nothing bolted on for show.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {['Next.js', 'Fastify', 'Neon DB', 'WebSockets', 'Stripe', 'Resend'].map((tech) => (
-                <span key={tech} className="bg-white border border-brand-border text-brand-ink text-xs font-semibold px-4 py-2 rounded-full">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="max-w-7xl mx-auto px-6 py-24 text-center">
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-brand-ink mb-4">
-            Want this for your shop?
+        {/* Three-card simple flow */}
+        <section className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-brand-ink text-center mb-4">
+            Three ways to explore.
           </h2>
-          <p className="text-brand-muted mb-8 text-lg max-w-lg mx-auto">
-            I build custom booking systems for salons, barbershops, and clinics. Let&apos;s talk.
+          <p className="text-brand-muted text-center mb-12 max-w-xl mx-auto">
+            Whether you&apos;re a shop owner, a customer, or here to see how it works — pick a door.
           </p>
-          <a
-            href="mailto:ali@kscope.ai"
-            className="inline-flex items-center gap-2 bg-brand-ink text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-brand-ink/80 transition-colors"
-          >
-            Contact Ali
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </a>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                label: '01 — Book a cut',
+                title: 'Customer flow',
+                body: 'Pick a barber, choose a service, grab a time. See what your clients would experience.',
+                cta: 'Start booking',
+                href: '/book/chop-barbers',
+                color: '#E8445A',
+              },
+              {
+                label: '02 — Live dashboard',
+                title: 'Real-time view',
+                body: 'Watch the owner dashboard update via WebSocket the moment someone books.',
+                cta: 'Watch live',
+                href: '/live',
+                color: '#22C9A8',
+              },
+              {
+                label: '03 — Run your own',
+                title: 'Register',
+                body: 'Spawn your own editable shop in 60 seconds. Share a booking link with real clients.',
+                cta: 'Create shop',
+                href: '/register',
+                color: '#8B5CF6',
+              },
+            ].map((card) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="group relative bg-white rounded-2xl border border-brand-border p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+              >
+                <div
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{ backgroundColor: card.color }}
+                />
+                <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: card.color }}>
+                  {card.label}
+                </p>
+                <h3 className="font-heading text-2xl font-semibold text-brand-ink leading-tight">
+                  {card.title}
+                </h3>
+                <p className="text-brand-muted text-sm leading-relaxed flex-1">{card.body}</p>
+                <span
+                  className="inline-flex items-center gap-2 text-sm font-semibold mt-2"
+                  style={{ color: card.color }}
+                >
+                  {card.cta}
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Contact */}
+        <section className="bg-brand-surface border-t border-brand-border">
+          <div className="max-w-4xl mx-auto px-6 py-20 text-center">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-brand-ink mb-3">
+              Want this for your shop?
+            </h2>
+            <p className="text-brand-muted text-base mb-8 max-w-lg mx-auto">
+              I build custom booking systems for salons, barbershops, and clinics. Let&apos;s talk.
+            </p>
+            <a
+              href="mailto:ali@kscope.ai"
+              className="inline-flex items-center gap-2 bg-brand-ink text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-brand-ink/80 transition-colors"
+            >
+              Contact Ali
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
         </section>
       </main>
       <Footer />
