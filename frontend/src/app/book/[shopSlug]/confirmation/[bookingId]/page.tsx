@@ -1,6 +1,9 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   params: Promise<{ shopSlug: string; bookingId: string }>;
@@ -21,15 +24,35 @@ interface BookingDetail {
   deposit_paid_cents: number;
 }
 
-export default async function ConfirmationPage({ params }: Props) {
-  const { shopSlug, bookingId } = await params;
+export default function ConfirmationPage({ params }: Props) {
+  const { shopSlug, bookingId } = use(params);
+  const [booking, setBooking] = useState<BookingDetail | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  let booking: BookingDetail;
-  try {
-    const res = await apiFetch<{ booking: BookingDetail }>(`/api/bookings/${bookingId}`);
-    booking = res.booking;
-  } catch {
-    notFound();
+  useEffect(() => {
+    apiFetch<{ booking: BookingDetail }>(`/api/bookings/${bookingId}`)
+      .then((res) => setBooking(res.booking))
+      .catch((err) => setError(err.message));
+  }, [bookingId]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+        <p className="text-brand-muted">{error}</p>
+      </div>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-6">
+        <div className="w-full max-w-md space-y-4">
+          <Skeleton className="h-16 w-16 rounded-full mx-auto" />
+          <Skeleton className="h-8 w-48 mx-auto" />
+          <Skeleton className="h-64 rounded-2xl" />
+        </div>
+      </div>
+    );
   }
 
   const formattedTime = new Intl.DateTimeFormat('en-US', {
@@ -40,7 +63,6 @@ export default async function ConfirmationPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md">
-        {/* Success icon */}
         <div className="w-16 h-16 rounded-full bg-brand-teal/10 flex items-center justify-center mx-auto mb-6">
           <svg className="w-8 h-8 text-brand-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -55,22 +77,10 @@ export default async function ConfirmationPage({ params }: Props) {
         </p>
 
         <div className="bg-white rounded-2xl border border-brand-border p-6 space-y-4 mb-6">
-          <div className="flex justify-between text-sm">
-            <span className="text-brand-muted">Name</span>
-            <span className="font-medium text-brand-ink">{booking.customer_name}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-brand-muted">Barber</span>
-            <span className="font-medium text-brand-ink">{booking.staff_name}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-brand-muted">Service</span>
-            <span className="font-medium text-brand-ink">{booking.service_name}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-brand-muted">When</span>
-            <span className="font-medium text-brand-ink text-right">{formattedTime}</span>
-          </div>
+          <div className="flex justify-between text-sm"><span className="text-brand-muted">Name</span><span className="font-medium text-brand-ink">{booking.customer_name}</span></div>
+          <div className="flex justify-between text-sm"><span className="text-brand-muted">Barber</span><span className="font-medium text-brand-ink">{booking.staff_name}</span></div>
+          <div className="flex justify-between text-sm"><span className="text-brand-muted">Service</span><span className="font-medium text-brand-ink">{booking.service_name}</span></div>
+          <div className="flex justify-between text-sm"><span className="text-brand-muted">When</span><span className="font-medium text-brand-ink text-right">{formattedTime}</span></div>
           <div className="border-t border-brand-border pt-4 flex justify-between text-sm">
             <span className="text-brand-muted">Status</span>
             <span className="font-semibold text-brand-teal capitalize">{booking.status}</span>

@@ -1,26 +1,59 @@
-import { getShop } from '@/lib/api/shops';
+'use client';
+
+import { use, useEffect, useState } from 'react';
+import { getShop, type ShopData } from '@/lib/api/shops';
 import { StaffPicker } from '@/components/booking/staff-picker';
-import { notFound } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   params: Promise<{ shopSlug: string }>;
 }
 
-export default async function BookPage({ params }: Props) {
-  const { shopSlug } = await params;
+export default function BookPage({ params }: Props) {
+  const { shopSlug } = use(params);
+  const [data, setData] = useState<ShopData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  let data;
-  try {
-    data = await getShop(shopSlug);
-  } catch {
-    notFound();
+  useEffect(() => {
+    getShop(shopSlug)
+      .then(setData)
+      .catch((err) => setError(err.message ?? 'Shop not found'));
+  }, [shopSlug]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-6">
+        <div className="text-center">
+          <p className="font-heading text-2xl font-bold text-brand-ink mb-2">Couldn&apos;t load shop</p>
+          <p className="text-brand-muted text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2]">
+        <header className="border-b border-brand-border">
+          <div className="max-w-4xl mx-auto px-6 py-5">
+            <Skeleton className="h-8 w-48" />
+          </div>
+        </header>
+        <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-9 w-64" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-6">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+          </div>
+        </main>
+      </div>
+    );
   }
 
   const { shop, staff, services, staffServices } = data;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: shop.colors.background }}>
-      {/* Shop header */}
       <header className="border-b" style={{ borderColor: `${shop.colors.primary}20` }}>
         <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
           <div>

@@ -1,30 +1,52 @@
-import { getShop } from '@/lib/api/shops';
-import { TimeSlotGrid } from '@/components/booking/time-slot-grid';
-import { notFound } from 'next/navigation';
+'use client';
+
+import { use, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { getShop, type ShopData } from '@/lib/api/shops';
+import { TimeSlotGrid } from '@/components/booking/time-slot-grid';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   params: Promise<{ shopSlug: string }>;
-  searchParams: Promise<{ staffId?: string; serviceId?: string }>;
 }
 
-export default async function TimePage({ params, searchParams }: Props) {
-  const { shopSlug } = await params;
-  const { staffId, serviceId } = await searchParams;
+export default function TimePage({ params }: Props) {
+  const { shopSlug } = use(params);
+  const searchParams = useSearchParams();
+  const staffId = searchParams.get('staffId');
+  const serviceId = searchParams.get('serviceId');
+  const [data, setData] = useState<ShopData | null>(null);
 
-  if (!staffId || !serviceId) notFound();
+  useEffect(() => {
+    if (!staffId || !serviceId) return;
+    getShop(shopSlug).then(setData).catch(() => {});
+  }, [shopSlug, staffId, serviceId]);
 
-  let data;
-  try {
-    data = await getShop(shopSlug);
-  } catch {
-    notFound();
+  if (!staffId || !serviceId) return <div className="min-h-screen flex items-center justify-center text-brand-muted">Missing selection.</div>;
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2]">
+        <header className="border-b border-brand-border">
+          <div className="max-w-4xl mx-auto px-6 py-5"><Skeleton className="h-8 w-48" /></div>
+        </header>
+        <main className="max-w-4xl mx-auto px-6 py-10 space-y-4">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-9 w-56" />
+          <Skeleton className="h-14 w-full" />
+          <div className="grid grid-cols-4 gap-2 pt-4">
+            {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-10 rounded-xl" />)}
+          </div>
+        </main>
+      </div>
+    );
   }
 
   const { shop, staff, services } = data;
   const barber = staff.find((s) => s.id === staffId);
   const service = services.find((s) => s.id === serviceId);
-  if (!barber || !service) notFound();
+  if (!barber || !service) return <div className="min-h-screen flex items-center justify-center text-brand-muted">Not found.</div>;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: shop.colors.background }}>
