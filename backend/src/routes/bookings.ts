@@ -52,6 +52,11 @@ export async function bookingRoutes(fastify: FastifyInstance) {
         },
       });
 
+      // Fire-and-forget confirmation email + fake SMS
+      const { rows: [shopFull] } = await db.query(
+        'SELECT name, email, address FROM shops WHERE id = $1', [shop.id]
+      );
+
       // Log fake SMS (preview only — no real Twilio)
       db.query(`
         INSERT INTO messages (booking_id, kind, recipient, subject, body, is_real)
@@ -61,11 +66,6 @@ export async function bookingRoutes(fastify: FastifyInstance) {
         body.customerPhone ?? body.customerEmail,
         `Hi ${body.customerName}! Your ${service.name} appointment is confirmed. See you soon — ${shopFull?.name ?? 'the shop'}`,
       ]).catch(() => {});
-
-      // Fire-and-forget confirmation email
-      const { rows: [shopFull] } = await db.query(
-        'SELECT name, email, address FROM shops WHERE id = $1', [shop.id]
-      );
       sendConfirmationEmail({
         bookingId: booking.id,
         customerName: body.customerName,
