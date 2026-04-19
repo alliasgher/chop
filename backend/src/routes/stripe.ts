@@ -5,7 +5,7 @@ import { env } from '../config';
 
 function getStripe() {
   if (!env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY not set');
-  return new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2025-03-31.basil' });
+  return new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' });
 }
 
 export async function stripeRoutes(fastify: FastifyInstance) {
@@ -66,7 +66,7 @@ export async function stripeRoutes(fastify: FastifyInstance) {
     }
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.CheckoutSession;
+      const session = event.data.object as Stripe.Checkout.Session;
       const bookingId = session.metadata?.booking_id;
       if (bookingId) {
         await db.query(`
