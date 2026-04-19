@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { KeepAlive } from '@/components/shared/keep-alive';
 
 export const metadata: Metadata = {
   title: 'Chop — Barbershop Booking',
@@ -23,10 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col antialiased">
-        <KeepAlive />
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col antialiased">{children}</body>
     </html>
   );
 }
