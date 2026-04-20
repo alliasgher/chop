@@ -46,8 +46,10 @@ export async function publicRoutes(fastify: FastifyInstance) {
       FROM bookings b
       JOIN services s ON s.id = b.service_id
       JOIN staff st ON st.id = b.staff_id
-      WHERE b.shop_id = $1 AND b.starts_at::date = CURRENT_DATE
+      WHERE b.shop_id = $1
+        AND b.starts_at >= now() - interval '2 hours'
       ORDER BY b.starts_at
+      LIMIT 30
     `, [shop.id]);
     return { bookings: rows };
   });

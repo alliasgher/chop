@@ -46,14 +46,10 @@ export function LiveDashboard() {
           const event = JSON.parse(e.data);
           if (event.type === 'booking.created') {
             const b = event.booking;
-            const bookingDate = b.starts_at?.slice(0, 10);
-            const today = new Date().toISOString().slice(0, 10);
-            if (bookingDate === today) {
-              setBookings((prev) => [{ ...b, isNew: true }, ...prev]);
-              setTimeout(() => {
-                setBookings((prev) => prev.map((bk) => bk.id === b.id ? { ...bk, isNew: false } : bk));
-              }, 3000);
-            }
+            setBookings((prev) => [{ ...b, isNew: true }, ...prev].slice(0, 30));
+            setTimeout(() => {
+              setBookings((prev) => prev.map((bk) => bk.id === b.id ? { ...bk, isNew: false } : bk));
+            }, 3000);
           }
           if (event.type === 'booking.updated') {
             setBookings((prev) => prev.map((b) => b.id === event.booking.id ? event.booking : b));
@@ -71,10 +67,12 @@ export function LiveDashboard() {
     };
   }, []);
 
-  const formatTime = (iso: string) =>
-    new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso));
-
-  const todayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date());
+  const formatWhen = (iso: string) => {
+    const d = new Date(iso);
+    const dateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(d);
+    const timeStr = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(d);
+    return `${dateStr} · ${timeStr}`;
+  };
 
   return (
     <div className="rounded-2xl overflow-hidden border border-white/10 bg-[#1A1825] shadow-xl">
@@ -86,7 +84,7 @@ export function LiveDashboard() {
             <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
             <div className="w-3 h-3 rounded-full bg-green-500/60" />
           </div>
-          <span className="text-white/50 text-sm font-medium">Chop Barbers — Today, {todayLabel}</span>
+          <span className="text-white/50 text-sm font-medium">Chop Barbers — Upcoming bookings</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-brand-teal animate-pulse' : 'bg-yellow-500'}`} />
@@ -133,7 +131,7 @@ export function LiveDashboard() {
                 )}
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-semibold text-white text-sm">{b.customer_name}</span>
-                  <span className="text-white/40 text-xs">{b.starts_at ? formatTime(b.starts_at) : ''}</span>
+                  <span className="text-white/40 text-xs whitespace-nowrap">{b.starts_at ? formatWhen(b.starts_at) : ''}</span>
                 </div>
                 <p className="text-white/50 text-xs">{b.service_name} · {b.staff_name}</p>
                 <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full font-medium capitalize
