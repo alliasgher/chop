@@ -11,10 +11,12 @@ export async function getOwnerShops(token: string) {
   return apiFetch<{ shops: any[] }>('/api/owner/shops', { token });
 }
 
-export async function getOwnerBookings(shopId: string, token: string, date?: string, status?: string) {
+export async function getOwnerBookings(shopId: string, token: string, opts: { date?: string; status?: string; from?: string; to?: string } = {}) {
   const params = new URLSearchParams();
-  if (date) params.set('date', date);
-  if (status) params.set('status', status);
+  if (opts.date) params.set('date', opts.date);
+  if (opts.status) params.set('status', opts.status);
+  if (opts.from) params.set('from', opts.from);
+  if (opts.to) params.set('to', opts.to);
   const qs = params.toString() ? `?${params.toString()}` : '';
   return apiFetch<{ bookings: any[] }>(`/api/owner/shops/${shopId}/bookings${qs}`, { token });
 }

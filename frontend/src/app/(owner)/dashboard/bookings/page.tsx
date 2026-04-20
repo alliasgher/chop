@@ -25,7 +25,7 @@ export default function BookingsPage() {
     if (!shop || !token) return;
     setLoading(true);
     try {
-      const res = await getOwnerBookings(shop.id, token, undefined, filter === 'all' ? undefined : filter);
+      const res = await getOwnerBookings(shop.id, token, { status: filter === 'all' ? undefined : filter });
       setBookings(res.bookings);
     } catch {}
     setLoading(false);

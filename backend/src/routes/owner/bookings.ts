@@ -7,7 +7,7 @@ export async function ownerBookingRoutes(fastify: FastifyInstance) {
   // GET /api/owner/shops/:shopId/bookings?date=YYYY-MM-DD&status=...
   fastify.get('/api/owner/shops/:shopId/bookings', { preHandler: verifyJwt }, async (req, reply) => {
     const { shopId } = req.params as { shopId: string };
-    const { date, status } = req.query as { date?: string; status?: string };
+    const { date, status, from, to } = req.query as { date?: string; status?: string; from?: string; to?: string };
     const user = req.user as { sub: string };
 
     const { rows: [shop] } = await db.query(
@@ -28,6 +28,14 @@ export async function ownerBookingRoutes(fastify: FastifyInstance) {
     if (date) {
       params.push(date);
       query += ` AND b.starts_at::date = $${params.length}`;
+    }
+    if (from) {
+      params.push(from);
+      query += ` AND b.starts_at >= $${params.length}`;
+    }
+    if (to) {
+      params.push(to);
+      query += ` AND b.starts_at < $${params.length}`;
     }
     if (status) {
       params.push(status);
