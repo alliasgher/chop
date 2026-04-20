@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/lib/stores/auth';
 import { getOwnerBookings, updateBookingStatus } from '@/lib/api/owner';
-import { format, isSameDay, addDays, startOfDay } from 'date-fns';
+import { format, addDays, startOfDay } from 'date-fns';
+import { formatTime, dateKeyInTz, tzAbbreviation } from '@/lib/tz';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-brand-amber/10 text-brand-amber border-brand-amber/20',
@@ -24,12 +25,12 @@ interface Booking {
   staff_name: string;
 }
 
-function BookingRow({ b, onStatus }: { b: Booking; onStatus: (id: string, status: string) => void }) {
+function BookingRow({ b, tz, onStatus }: { b: Booking; tz: string; onStatus: (id: string, status: string) => void }) {
   return (
     <div className="bg-white rounded-2xl border border-brand-border p-5 flex items-center gap-5 hover:shadow-sm transition-shadow">
       <div className="text-center w-16 shrink-0">
-        <div className="font-heading text-xl font-bold text-brand-ink">
-          {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(b.starts_at))}
+        <div className="font-heading text-xl font-bold text-brand-ink whitespace-nowrap">
+          {formatTime(b.starts_at, tz)}
         </div>
         <div className="text-xs text-brand-muted">{b.duration_min ?? '—'} min</div>
       </div>
@@ -102,19 +103,23 @@ export default function TodayPage() {
     } catch {}
   };
 
+  const tz = shop?.timezone ?? 'America/New_York';
   const today = new Date();
+  const todayKey = dateKeyInTz(today, tz);
+
   const todayBookings = bookings
-    .filter((b) => isSameDay(new Date(b.starts_at), today))
+    .filter((b) => dateKeyInTz(b.starts_at, tz) === todayKey)
     .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 
   // Group upcoming bookings (next 7 days, excluding today) by date
-  const upcomingByDay: { date: Date; bookings: Booking[] }[] = [];
+  const upcomingByDay: { date: Date; key: string; bookings: Booking[] }[] = [];
   for (let i = 1; i <= 7; i++) {
     const day = addDays(today, i);
+    const dayKey = dateKeyInTz(day, tz);
     const dayBookings = bookings
-      .filter((b) => isSameDay(new Date(b.starts_at), day))
+      .filter((b) => dateKeyInTz(b.starts_at, tz) === dayKey)
       .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
-    if (dayBookings.length > 0) upcomingByDay.push({ date: day, bookings: dayBookings });
+    if (dayBookings.length > 0) upcomingByDay.push({ date: day, key: dayKey, bookings: dayBookings });
   }
 
   return (
@@ -122,7 +127,7 @@ export default function TodayPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-heading text-3xl font-bold text-brand-ink">Today</h1>
-          <p className="text-brand-muted text-sm mt-1">{format(today, 'EEEE, MMMM d')}</p>
+          <p className="text-brand-muted text-sm mt-1">{format(today, 'EEEE, MMMM d')} · Times in {tzAbbreviation(tz)}</p>
         </div>
         <div className="flex items-center gap-2 text-xs text-brand-teal bg-brand-teal/10 px-3 py-1.5 rounded-full border border-brand-teal/20">
           <span className="w-1.5 h-1.5 rounded-full bg-brand-teal animate-pulse" />
@@ -147,7 +152,7 @@ export default function TodayPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {todayBookings.map((b) => <BookingRow key={b.id} b={b} onStatus={changeStatus} />)}
+              {todayBookings.map((b) => <BookingRow key={b.id} b={b} tz={tz} onStatus={changeStatus} />)}
             </div>
           )}
 
@@ -165,7 +170,7 @@ export default function TodayPage() {
                       <span className="text-xs text-brand-muted">· {bookings.length} booking{bookings.length === 1 ? '' : 's'}</span>
                     </div>
                     <div className="space-y-3">
-                      {bookings.map((b) => <BookingRow key={b.id} b={b} onStatus={changeStatus} />)}
+                      {bookings.map((b) => <BookingRow key={b.id} b={b} tz={tz} onStatus={changeStatus} />)}
                     </div>
                   </div>
                 ))}

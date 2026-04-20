@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/lib/stores/auth';
 import { apiFetch } from '@/lib/api/client';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/tz';
 
 interface Message {
   id: string; kind: 'email' | 'sms'; recipient: string; subject: string | null;
@@ -12,6 +12,7 @@ interface Message {
 
 export default function MessagesPage() {
   const { token, shop } = useAuthStore();
+  const tz = shop?.timezone ?? 'America/New_York';
   const [messages, setMessages] = useState<Message[]>([]);
   const [filter, setFilter] = useState<'all' | 'email' | 'sms'>('all');
   const [loading, setLoading] = useState(true);
@@ -80,7 +81,7 @@ export default function MessagesPage() {
                   <span className="font-semibold text-brand-ink text-sm">{msg.customer_name}</span>
                 </div>
                 <span className="text-brand-muted text-xs shrink-0">
-                  {format(new Date(msg.sent_at), 'MMM d, h:mma')}
+                  {formatDateTime(msg.sent_at, tz)}
                 </span>
               </div>
               <p className="text-brand-muted text-xs mb-1">{msg.recipient}</p>

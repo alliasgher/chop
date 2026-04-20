@@ -28,7 +28,12 @@ function LoginForm() {
 
       // Load first shop
       const { shops } = await apiFetch<{ shops: any[] }>('/api/owner/shops', { token });
-      if (shops[0]) setShop({ id: shops[0].id, slug: shops[0].slug, name: shops[0].name });
+      if (shops[0]) setShop({
+        id: shops[0].id,
+        slug: shops[0].slug,
+        name: shops[0].name,
+        timezone: shops[0].timezone ?? 'America/New_York',
+      });
 
       const next = searchParams.get('next') ?? '/dashboard/today';
       router.push(next);

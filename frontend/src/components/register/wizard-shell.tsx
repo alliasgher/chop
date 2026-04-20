@@ -76,7 +76,7 @@ export function WizardShell() {
       });
 
       setAuth(user, token);
-      setShop({ id: shop.id, slug: shop.slug, name: shop.name });
+      setShop({ id: shop.id, slug: shop.slug, name: shop.name, timezone: shop.timezone });
       next();
     } catch (err: any) {
       setError(err.message ?? 'Something went wrong');

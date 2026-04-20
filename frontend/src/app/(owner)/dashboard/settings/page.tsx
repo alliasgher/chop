@@ -29,7 +29,7 @@ export default function SettingsPage() {
     const { shop: updated } = await apiFetch<{ shop: any }>(`/api/owner/shops/${shop.id}`, {
       method: 'PATCH', token, body: form,
     });
-    setShop({ id: updated.id, slug: updated.slug, name: updated.name });
+    setShop({ id: updated.id, slug: updated.slug, name: updated.name, timezone: updated.timezone });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

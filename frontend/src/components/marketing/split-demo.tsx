@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { formatDateTime, tzAbbreviation } from '@/lib/tz';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:3001';
@@ -20,6 +21,7 @@ export function SplitDemo() {
   const [bookings, setBookings] = useState<LiveBooking[]>([]);
   const [connected, setConnected] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [tz, setTz] = useState<string>('America/New_York');
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export function SplitDemo() {
         if (!shopRes.ok) return;
         const { shop } = await shopRes.json();
         if (!shop || cancelled) return;
+        setTz(shop.timezone ?? 'America/New_York');
 
         const bookRes = await fetch(`${API_URL}/api/shops/${SHOP_SLUG}/bookings/today`);
         if (bookRes.ok && !cancelled) {
@@ -65,12 +68,7 @@ export function SplitDemo() {
     };
   }, []);
 
-  const formatWhen = (iso: string) => {
-    const d = new Date(iso);
-    const dateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(d);
-    const timeStr = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(d);
-    return `${dateStr} · ${timeStr}`;
-  };
+  const formatWhen = (iso: string) => formatDateTime(iso, tz);
 
   return (
     <div className="grid md:grid-cols-2 gap-4">
@@ -111,7 +109,7 @@ export function SplitDemo() {
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
             </div>
-            <span className="text-white/50 text-xs font-mono truncate">owner dashboard — live</span>
+            <span className="text-white/50 text-xs font-mono truncate">owner dashboard · {tzAbbreviation(tz)}</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs shrink-0">
             <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-brand-teal animate-pulse' : 'bg-yellow-500'}`} />

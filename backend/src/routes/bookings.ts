@@ -94,7 +94,8 @@ export async function bookingRoutes(fastify: FastifyInstance) {
     const { id } = req.params as { id: string };
     const { rows: [booking] } = await db.query(`
       SELECT b.*, s.name AS service_name, s.price_cents, s.duration_min,
-             st.name AS staff_name, sh.name AS shop_name, sh.slug AS shop_slug
+             st.name AS staff_name, sh.name AS shop_name, sh.slug AS shop_slug,
+             sh.timezone AS shop_timezone
       FROM bookings b
       JOIN services s ON s.id = b.service_id
       JOIN staff st ON st.id = b.staff_id

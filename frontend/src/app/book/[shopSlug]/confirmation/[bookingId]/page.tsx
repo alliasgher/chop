@@ -20,6 +20,7 @@ interface BookingDetail {
   staff_name: string;
   shop_name: string;
   shop_slug: string;
+  shop_timezone: string;
   price_cents: number;
   deposit_paid_cents: number;
 }
@@ -55,9 +56,11 @@ export default function ConfirmationPage({ params }: Props) {
     );
   }
 
+  const tz = booking.shop_timezone ?? 'America/New_York';
   const formattedTime = new Intl.DateTimeFormat('en-US', {
     weekday: 'long', month: 'long', day: 'numeric',
     hour: 'numeric', minute: '2-digit', hour12: true,
+    timeZone: tz,
   }).format(new Date(booking.starts_at));
 
   return (

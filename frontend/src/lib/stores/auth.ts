@@ -11,9 +11,9 @@ interface User {
 interface AuthState {
   user: User | null;
   token: string | null;
-  shop: { id: string; slug: string; name: string } | null;
+  shop: { id: string; slug: string; name: string; timezone: string } | null;
   setAuth: (user: User, token: string) => void;
-  setShop: (shop: { id: string; slug: string; name: string }) => void;
+  setShop: (shop: { id: string; slug: string; name: string; timezone: string }) => void;
   logout: () => void;
 }
 
